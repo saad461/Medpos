@@ -28,11 +28,13 @@ export async function middleware(request: NextRequest) {
 
   if (isPublicRoute) {
     // We still need to update session for auth pages to handle redirects if already logged in
+    const { supabaseResponse, user } = await updateSession(request)
+
+    if (user && (pathname === '/' || ['/login', '/signup', '/forgot-password'].includes(pathname))) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
     if (['/login', '/signup', '/forgot-password'].includes(pathname)) {
-      const { supabaseResponse, user } = await updateSession(request)
-      if (user) {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
-      }
       return supabaseResponse
     }
     return NextResponse.next()
