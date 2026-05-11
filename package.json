@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed:demo": "ts-node scripts/seed-demo.ts"
+    "seed:demo": "ts-node scripts/seed-demo.ts",
+    "create:admin": "ts-node scripts/create-super-admin.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
