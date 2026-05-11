@@ -1,0 +1,273 @@
+import React from 'react'
+import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
+import { formatPKDate, formatPKDateTime } from './date-utils'
+
+// Register fonts if needed
+// Font.register({ family: 'Inter', src: '...' })
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 30,
+    fontSize: 10,
+    fontFamily: 'Helvetica',
+    color: '#333',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderBottom: 1,
+    borderBottomColor: '#eee',
+    paddingBottom: 10,
+  },
+  logo: {
+    width: 60,
+    height: 60,
+  },
+  storeInfo: {
+    textAlign: 'right',
+  },
+  storeName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1E3A5F',
+  },
+  reportTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    textTransform: 'uppercase',
+    color: '#1E3A5F',
+  },
+  dateRange: {
+    fontSize: 9,
+    color: '#666',
+    marginBottom: 20,
+  },
+  summaryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+  summaryCard: {
+    width: '23%',
+    padding: 10,
+    backgroundColor: '#f8fafc',
+    borderRadius: 4,
+    border: 1,
+    borderColor: '#e2e8f0',
+  },
+  summaryLabel: {
+    fontSize: 8,
+    color: '#64748b',
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  summaryValue: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#1E3A5F',
+  },
+  table: {
+    width: 'auto',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+  },
+  tableRow: {
+    margin: 'auto',
+    flexDirection: 'row',
+  },
+  tableCol: {
+    width: '20%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+  },
+  tableHeader: {
+    backgroundColor: '#f1f5f9',
+    fontWeight: 'bold',
+  },
+  tableCell: {
+    margin: 'auto',
+    marginTop: 5,
+    marginBottom: 5,
+    fontSize: 8,
+    padding: 3,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 30,
+    left: 30,
+    right: 30,
+    textAlign: 'center',
+    color: '#94a3b8',
+    fontSize: 8,
+    borderTop: 1,
+    borderTopColor: '#eee',
+    paddingTop: 10,
+  },
+  // FBR Specific Styles
+  fbrTitle: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  declaration: {
+    marginTop: 40,
+    fontSize: 9,
+    lineHeight: 1.5,
+  },
+  signatureRow: {
+    marginTop: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  signatureLine: {
+    width: 150,
+    borderTop: 1,
+    marginTop: 20,
+    textAlign: 'center',
+    fontSize: 8,
+  }
+})
+
+const formatPKR = (amount: number) => `Rs. ${amount.toLocaleString()}`
+
+interface BaseReportProps {
+  storeSettings: any
+  dateRange: { from: Date; to: Date }
+  title: string
+  summary: { label: string; value: string | number }[]
+  columns: string[]
+  data: any[][]
+}
+
+export const ReportPDF = ({ storeSettings, dateRange, title, summary, columns, data }: BaseReportProps) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.header}>
+        {storeSettings.logo_url ? (
+          <Image src={storeSettings.logo_url} style={styles.logo} />
+        ) : (
+          <Text style={styles.storeName}>{storeSettings.name || 'Pharmacy POS'}</Text>
+        )}
+        <View style={styles.storeInfo}>
+          <Text style={{ fontWeight: 'bold' }}>{storeSettings.name}</Text>
+          <Text>{storeSettings.address}</Text>
+          <Text>{storeSettings.phone}</Text>
+          {storeSettings.ntn && <Text>NTN: {storeSettings.ntn}</Text>}
+          {storeSettings.strn && <Text>STRN: {storeSettings.strn}</Text>}
+        </View>
+      </View>
+
+      <Text style={styles.reportTitle}>{title}</Text>
+      <Text style={styles.dateRange}>
+        Period: {formatPKDate(dateRange.from)} - {formatPKDate(dateRange.to)}
+      </Text>
+
+      <View style={styles.summaryGrid}>
+        {summary.map((item, i) => (
+          <View key={i} style={styles.summaryCard}>
+            <Text style={styles.summaryLabel}>{item.label}</Text>
+            <Text style={styles.summaryValue}>{item.value}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.table}>
+        <View style={[styles.tableRow, styles.tableHeader]}>
+          {columns.map((col, i) => (
+            <View key={i} style={[styles.tableCol, { width: `${100 / columns.length}%` }]}>
+              <Text style={styles.tableCell}>{col}</Text>
+            </View>
+          ))}
+        </View>
+        {data.map((row, i) => (
+          <View key={i} style={styles.tableRow}>
+            {row.map((cell, j) => (
+              <View key={j} style={[styles.tableCol, { width: `${100 / columns.length}%` }]}>
+                <Text style={styles.tableCell}>{cell}</Text>
+              </View>
+            ))}
+          </View>
+        ))}
+      </View>
+
+      <Text style={styles.footer}>
+        Generated by MedPOS on {formatPKDateTime(new Date())} - Page 1 of 1
+      </Text>
+    </Page>
+  </Document>
+)
+
+export const FBRTaxPDF = ({ storeSettings, dateRange, summary, data }: any) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.fbrTitle}>
+        <Text>SALES TAX RETURN — SUMMARY STATEMENT</Text>
+      </View>
+
+      <View style={styles.header}>
+        <View>
+          <Text style={{ fontSize: 12, fontWeight: 'bold' }}>{storeSettings.name}</Text>
+          <Text>{storeSettings.address}</Text>
+        </View>
+        <View style={styles.storeInfo}>
+          <Text>NTN: {storeSettings.ntn || 'N/A'}</Text>
+          <Text>STRN: {storeSettings.strn || 'N/A'}</Text>
+          <Text>Tax Period: {format(dateRange.from, 'MMMM yyyy')}</Text>
+        </View>
+      </View>
+
+      <View style={[styles.table, { marginTop: 20 }]}>
+        <View style={[styles.tableRow, styles.tableHeader]}>
+          <View style={[styles.tableCol, { width: '40%' }]}><Text style={styles.tableCell}>Description</Text></View>
+          <View style={[styles.tableCol, { width: '30%' }]}><Text style={styles.tableCell}>Amount</Text></View>
+          <View style={[styles.tableCol, { width: '30%' }]}><Text style={styles.tableCell}>Tax</Text></View>
+        </View>
+        <View style={styles.tableRow}>
+          <View style={[styles.tableCol, { width: '40%' }]}><Text style={styles.tableCell}>Total Taxable Sales</Text></View>
+          <View style={[styles.tableCol, { width: '30%' }]}><Text style={styles.tableCell}>{formatPKR(summary.taxableSales)}</Text></View>
+          <View style={[styles.tableCol, { width: '30%' }]}><Text style={styles.tableCell}>{formatPKR(summary.taxCollected)}</Text></View>
+        </View>
+        <View style={[styles.tableRow, { fontWeight: 'bold' }]}>
+          <View style={[styles.tableCol, { width: '40%' }]}><Text style={styles.tableCell}>Net Sales</Text></View>
+          <View style={[styles.tableCol, { width: '30%' }]}><Text style={styles.tableCell}>{formatPKR(summary.netSales)}</Text></View>
+          <View style={[styles.tableCol, { width: '30%' }]}><Text style={styles.tableCell}>—</Text></View>
+        </View>
+      </View>
+
+      <View style={styles.declaration}>
+        <Text>"I hereby declare that the information provided in this statement is correct and complete to the best of my knowledge."</Text>
+      </View>
+
+      <View style={styles.signatureRow}>
+        <View style={styles.signatureLine}>
+          <Text>Signature</Text>
+        </View>
+        <View style={styles.signatureLine}>
+          <Text>Date</Text>
+        </View>
+        <View style={styles.signatureLine}>
+          <Text>Designation: Owner/Manager</Text>
+        </View>
+      </View>
+
+      <View style={[styles.footer, { borderTop: 0 }]}>
+        <Text style={{ marginBottom: 5 }}>Generated by MedPOS on {formatPKDateTime(new Date())}</Text>
+        <Text>This document is for record-keeping purposes. Consult a tax professional for FBR filing requirements.</Text>
+        <Text style={{ marginTop: 5, fontWeight: 'bold' }}>This is a summary for record-keeping only. Consult a certified tax advisor for official FBR filing.</Text>
+      </View>
+    </Page>
+  </Document>
+)
+
+import { format } from 'date-fns'
