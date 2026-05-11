@@ -1,0 +1,101 @@
+name,generic_name,company,unit,registration_number,registration_date,drap_mrp
+Panadol 500mg,Paracetamol,GSK,Tablet,012345,2020-01-01,3.00
+Panadol Extra,Paracetamol+Caffeine,GSK,Tablet,012346,2020-01-01,5.00
+Augmentin 625mg,Amoxicillin+Clavulanate,GSK,Tablet,012347,2020-01-01,25.00
+Risek 20mg,Omeprazole,AGP,Capsule,012348,2020-01-01,18.00
+Glucophage 500mg,Metformin,Merck,Tablet,012349,2020-01-01,5.00
+Norvasc 5mg,Amlodipine,Pfizer,Tablet,012350,2020-01-01,10.00
+Zyrtec 10mg,Cetirizine,UCB,Tablet,012351,2020-01-01,8.00
+Betnovate Cream,Betamethasone,GSK,Cream,012352,2020-01-01,45.00
+Ventolin Inhaler,Salbutamol,GSK,Inhaler,012353,2020-01-01,250.00
+Lipitor 10mg,Atorvastatin,Pfizer,Tablet,012354,2020-01-01,20.00
+Celin 500mg,Vitamin C,GSK,Tablet,012355,2020-01-01,2.00
+Xanax 0.5mg,Alprazolam,Pfizer,Tablet,012356,2020-01-01,15.00
+Plavix 75mg,Clopidogrel,Sanofi,Tablet,012357,2020-01-01,35.00
+Synthroid 50mcg,Levothyroxine,Abbott,Tablet,012358,2020-01-01,12.00
+Tobrex Eye Drops,Tobramycin,Alcon,Drops,012359,2020-01-01,150.00
+Lexapro 10mg,Escitalopram,Lundbeck,Tablet,012360,2020-01-01,25.00
+Canesten Cream,Clotrimazole,Bayer,Cream,012361,2020-01-01,65.00
+Zovirax 200mg,Acyclovir,GSK,Tablet,012362,2020-01-01,30.00
+Vermox 100mg,Mebendazole,Janssen,Tablet,012363,2020-01-01,10.00
+Deltacortril 5mg,Prednisolone,Pfizer,Tablet,012364,2020-01-01,2.00
+Lanoxin 0.25mg,Digoxin,GSK,Tablet,012365,2020-01-01,5.00
+Risperdal 2mg,Risperdone,Janssen,Tablet,012366,2020-01-01,40.00
+Brufen 400mg,Ibuprofen,Abbott,Tablet,012367,2020-01-01,8.00
+Flagyl 400mg,Metronidazole,Sanofi,Tablet,012368,2020-01-01,5.00
+Nexium 20mg,Esomeprazole,AstraZeneca,Tablet,012369,2020-01-01,25.00
+Amaryl 2mg,Glimepiride,Sanofi,Tablet,012370,2020-01-01,12.00
+Concor 5mg,Bisoprolol,Merck,Tablet,012371,2020-01-01,15.00
+Fexet 120mg,Fexofenadine,Getz,Tablet,012372,2020-01-01,18.00
+Dermovate Ointment,Clobetasol,GSK,Ointment,012373,2020-01-01,85.00
+Singulair 10mg,Montelukast,MSD,Tablet,012374,2020-01-01,45.00
+Rozucor 10mg,Rosuvastatin,Getz,Tablet,012375,2020-01-01,25.00
+Neurobion,Vitamin B Complex,Merck,Tablet,012376,2020-01-01,10.00
+Valium 5mg,Diazepam,Roche,Tablet,012377,2020-01-01,5.00
+Clexane 40mg,Heparin,Sanofi,Injection,012378,2020-01-01,450.00
+Eltroxin 50mcg,Levothyroxine,GSK,Tablet,012379,2020-01-01,8.00
+Maxidex Eye Drops,Dexamethasone,Alcon,Drops,012380,2020-01-01,120.00
+Zoloft 50mg,Sertraline,Pfizer,Tablet,012381,2020-01-01,35.00
+Daktarin Cream,Miconazole,Janssen,Cream,012382,2020-01-01,75.00
+Tamiflu 75mg,Oseltamivir,Roche,Capsule,012383,2020-01-01,150.00
+Zentel 400mg,Albendazole,GSK,Tablet,012384,2020-01-01,25.00
+Decadron 0.5mg,Dexamethasone,MSD,Tablet,012385,2020-01-01,2.00
+Cordarone 200mg,Amiodarone,Sanofi,Tablet,012386,2020-01-01,45.00
+Zyprexa 5mg,Olanzapine,Eli Lilly,Tablet,012387,2020-01-01,80.00
+Ponstan 250mg,Mefenamic Acid,Pfizer,Capsule,012388,2020-01-01,12.00
+Klacid 500mg,Clarithromycin,Abbott,Tablet,012389,2020-01-01,65.00
+Motilium 10mg,Domperidone,Janssen,Tablet,012390,2020-01-01,8.00
+Diamicron 60mg,Gliclazide,Servier,Tablet,012391,2020-01-01,20.00
+Cozaar 50mg,Losartan,MSD,Tablet,012392,2020-01-01,15.00
+Piriton 4mg,Chlorphenamine,GSK,Tablet,012393,2020-01-01,2.00
+Fucidin Cream,Fusidic Acid,LEO,Cream,012394,2020-01-01,110.00
+Symbicort Inhaler,Budesonide+Formoterol,AstraZeneca,Inhaler,012395,2020-01-01,1200.00
+Crestor 10mg,Rosuvastatin,AstraZeneca,Tablet,012396,2020-01-01,45.00
+Neurobion Injection,Vitamin B Complex,Merck,Injection,012397,2020-01-01,25.00
+Rivotril 2mg,Clonazepam,Roche,Tablet,012398,2020-01-01,10.00
+Ecosprin 75mg,Aspirin,Getz,Tablet,012399,2020-01-01,3.00
+Duphaston 10mg,Dydrogesterone,Abbott,Tablet,012400,2020-01-01,55.00
+Systane Eye Drops,Artificial Tears,Alcon,Drops,012401,2020-01-01,350.00
+Prozac 20mg,Fluoxetine,Eli Lilly,Capsule,012402,2020-01-01,40.00
+Nizoral Shampoo,Ketoconazole,Janssen,Shampoo,012403,2020-01-01,450.00
+Viraferon 200mg,Acyclovir,Sami,Tablet,012404,2020-01-01,15.00
+Combantrin,Pyrantel,Pfizer,Tablet,012405,2020-01-01,15.00
+Oradexon 0.5mg,Dexamethasone,Organon,Tablet,012406,2020-01-01,2.00
+Isoket 20mg,Isosorbide,UCB,Tablet,012407,2020-01-01,12.00
+Haldol 5mg,Haloperidol,Janssen,Tablet,012408,2020-01-01,5.00
+Voltaren 50mg,Diclofenac,Novartis,Tablet,012409,2020-01-01,15.00
+Zinnat 250mg,Cefuroxime,GSK,Tablet,012410,2020-01-01,55.00
+Gaviscon Syrup,Alginate,Reckitt,Syrup,012411,2020-01-01,180.00
+Januvia 100mg,Sitagliptin,MSD,Tablet,012412,2020-01-01,95.00
+Tenormin 50mg,Atenolol,AstraZeneca,Tablet,012413,2020-01-01,10.00
+Allegra 120mg,Fexofenadine,Sanofi,Tablet,012414,2020-01-01,25.00
+Bactroban Ointment,Mupirocin,GSK,Ointment,012415,2020-01-01,150.00
+Seretide Diskus,Fluticasone+Salmeterol,GSK,Inhaler,012416,2020-01-01,1500.00
+Zocor 20mg,Simvastatin,MSD,Tablet,012417,2020-01-01,35.00
+Calcirol Sachet,Vitamin D3,Getz,Sachet,012418,2020-01-01,50.00
+Ativan 1mg,Lorazepam,Pfizer,Tablet,012419,2020-01-01,5.00
+Warfarin 5mg,Warfarin,Various,Tablet,012420,2020-01-01,8.00
+Microgynon,Levonorgestrel+Ethinylestradiol,Bayer,Tablet,012421,2020-01-01,35.00
+Xalatan Eye Drops,Latanoprost,Pfizer,Drops,012422,2020-01-01,850.00
+Amitriptyline 25mg,Amitriptyline,Various,Tablet,012423,2020-01-01,5.00
+Mycostatin Oral Susp,Nystatin,BMS,Suspension,012424,2020-01-01,120.00
+Valtrex 500mg,Valacyclovir,GSK,Tablet,012425,2020-01-01,250.00
+Stromectol 3mg,Ivermectin,MSD,Tablet,012426,2020-01-01,150.00
+Solu-Cortef 100mg,Hydrocortisone,Pfizer,Injection,012427,2020-01-01,250.00
+GTN Spray,Nitroglycerin,Various,Spray,012428,2020-01-01,450.00
+Seroquel 25mg,Quetiapine,AstraZeneca,Tablet,012429,2020-01-01,45.00
+Cataflam 50mg,Diclofenac Potassium,Novartis,Tablet,012430,2020-01-01,18.00
+Keflex 500mg,Cephalexin,Eli Lilly,Capsule,012431,2020-01-01,25.00
+Lopamide 2mg,Loperamide,Sami,Tablet,012432,2020-01-01,2.00
+Galvus 50mg,Vildagliptin,Novartis,Tablet,012433,2020-01-01,45.00
+Micardis 40mg,Telmisartan,Boehringer,Tablet,012434,2020-01-01,35.00
+Avil 25mg,Pheniramine,Sanofi,Tablet,012435,2020-01-01,2.00
+Retin-A Cream,Tretinoin,Janssen,Cream,012436,2020-01-01,150.00
+Theolair 250mg,Theophylline,3M,Tablet,012437,2020-01-01,15.00
+Simva 20mg,Simvastatin,Sami,Tablet,012438,2020-01-01,15.00
+Sangobion,Iron+Vitamins,Merck,Capsule,012439,2020-01-01,12.00
+Phenobarbitone 30mg,Phenobarbitone,Various,Tablet,012440,2020-01-01,5.00
+Aspirin 300mg,Aspirin,Various,Tablet,012441,2020-01-01,2.00
+Yasmin,Drospirenone+Ethinylestradiol,Bayer,Tablet,012442,2020-01-01,850.00
+Opticrom Eye Drops,Cromoglicate,Sanofi,Drops,012443,2020-01-01,180.00
+Efexor XR 75mg,Venlafaxine,Pfizer,Capsule,012444,2020-01-01,85.00

@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "seed:demo": "ts-node scripts/seed-demo.ts",
-    "create:admin": "ts-node scripts/create-super-admin.ts"
+    "create:admin": "ts-node scripts/create-super-admin.ts",
+    "scrape:drap": "ts-node scripts/scrape-drap.ts",
+    "import:drap": "ts-node scripts/import-drap.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -25,9 +27,13 @@
     "@tanstack/react-query": "^5.100.9",
     "@tanstack/react-table": "^8.21.3",
     "@vercel/analytics": "^2.0.1",
+    "axios": "^1.16.0",
+    "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "csv-parse": "^6.2.1",
+    "csv-writer": "^1.6.0",
     "date-fns": "^4.1.0",
     "lucide-react": "^1.14.0",
     "next": "14.2.16",
