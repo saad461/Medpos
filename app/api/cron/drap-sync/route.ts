@@ -1,11 +1,97 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import {
+  fetchDRAPPrices,
+  findBestMatch,
+  notifyAllStoresOfDRAPUpdate,
+  sendDRAPSyncEmail,
+  sendDRAPSyncFailureEmail
+} from '@/lib/medicines/drap-sync';
 
-export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization')
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+export async function GET(request: NextRequest) {
+  // 1. Verify CRON_SECRET
+  const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // TODO: Step 12 — Sync medicine database with DRAP PDF/website
-  return NextResponse.json({ message: 'Not implemented yet' }, { status: 200 })
+  const startTime = Date.now();
+  const results = {
+    medicines_checked: 0,
+    prices_updated: 0,
+    new_medicines_found: 0,
+    errors: [] as string[],
+    duration_ms: 0,
+  };
+
+  try {
+    // 2. Fetch DRAP MRP data
+    const drapData = await fetchDRAPPrices();
+
+    // 3. For each medicine in our DB, fuzzy match with DRAP data
+    const { data: medicines } = await supabase
+      .from('medicines')
+      .select('id, name, drap_mrp')
+      .eq('scope', 'global');
+
+    if (medicines) {
+      for (const medicine of medicines) {
+        const match = findBestMatch(medicine.name, drapData);
+
+        if (match && match.score > 0.8) {
+          const newMRP = match.price;
+
+          if (newMRP !== medicine.drap_mrp) {
+            // Update the DRAP MRP
+            const { error: updateError } = await supabase
+              .from('medicines')
+              .update({ drap_mrp: newMRP })
+              .eq('id', medicine.id);
+
+            if (!updateError) {
+              // Log the change
+              await supabase
+                .from('price_change_log')
+                .insert({
+                  medicine_id: medicine.id,
+                  old_drap_mrp: medicine.drap_mrp,
+                  new_drap_mrp: newMRP,
+                });
+
+              results.prices_updated++;
+            } else {
+              results.errors.push(`Update failed for ${medicine.name}: ${updateError.message}`);
+            }
+          }
+          results.medicines_checked++;
+        }
+      }
+    }
+
+    results.duration_ms = Date.now() - startTime;
+
+    // 4. Send summary email to Super Admin
+    await sendDRAPSyncEmail(results);
+
+    // 5. Create in-app notification for all store owners
+    await notifyAllStoresOfDRAPUpdate(results.prices_updated);
+
+    return NextResponse.json({ success: true, results });
+
+  } catch (error) {
+    results.errors.push(String(error));
+    results.duration_ms = Date.now() - startTime;
+
+    // Send failure alert to admin
+    await sendDRAPSyncFailureEmail(String(error));
+
+    return NextResponse.json(
+      { success: false, results },
+      { status: 500 }
+    );
+  }
 }

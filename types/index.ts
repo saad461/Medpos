@@ -66,6 +66,9 @@ export interface Medicine {
   submitted_by?: string
   is_controlled: boolean
   description?: string
+  registration_number?: string
+  registration_date?: string
+  dosage_form?: string
   created_at: string
   updated_at: string
 }
@@ -221,6 +224,49 @@ export interface Notification {
   is_read: boolean
   data?: Record<string, unknown>
   created_at: string
+}
+
+export interface MedicineSearchResult {
+  id: string
+  medicine_id: string
+  name: string
+  generic_name?: string
+  category?: string
+  company?: string
+  unit?: string
+  drap_mrp?: number
+  sale_price: number
+  purchase_price?: number
+  stock_qty: number
+  expiry_date?: string
+  barcode?: string
+  reorder_level: number
+  is_controlled: boolean
+  is_low_stock: boolean
+  is_out_of_stock: boolean
+  is_expiring_soon: boolean
+  profit_margin: string | null
+}
+
+export interface MedicineGlobalSearchResult extends Medicine {
+  is_in_store: boolean
+  store_medicine_id?: string
+}
+
+export interface DRAPMedicine {
+  name: string
+  generic_name?: string
+  company?: string
+  mrp: number
+  registration_no?: string
+}
+
+export interface DRAPSyncResult {
+  medicines_checked: number
+  prices_updated: number
+  new_medicines_found: number
+  errors: string[]
+  duration_ms: number
 }
 
 export interface CartItem {
