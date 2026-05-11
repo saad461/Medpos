@@ -92,3 +92,20 @@
     @apply font-sans;
   }
 }
+@media print {
+  /* Hide everything except invoice */
+  body > * { display: none; }
+  #invoice-print-area { display: block !important; }
+
+  /* Invoice print styles */
+  #invoice-print-area {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    width: 80mm;  /* standard receipt width */
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Page break control */
+  .no-break { page-break-inside: avoid; }
+}
