@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { MEDICINE_CATEGORIES } from '@/lib/medicines/categories';
 import { Database } from '@/types';
 
 export async function GET(request: NextRequest) {
-  const supabase = createRouteHandlerClient<Database>({ cookies });
+  const supabase = await createClient();
 
   // Use SQL grouping and counting
   const { data: counts, error } = await supabase

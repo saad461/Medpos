@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { CustomerForm } from '@/components/customers/customer-form'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { PurchaseOrderForm } from '@/components/suppliers/purchase-order-form'
 import { ChevronLeft } from 'lucide-react'

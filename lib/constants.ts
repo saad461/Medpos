@@ -19,3 +19,30 @@ export const COLORS = {
   danger: '#DC2626',
   surface: '#F8FAFC',
 } as const
+
+export const PAKISTAN_CITIES = [
+  'Karachi',
+  'Lahore',
+  'Islamabad',
+  'Rawalpindi',
+  'Faisalabad',
+  'Multan',
+  'Peshawar',
+  'Quetta',
+  'Sialkot',
+  'Gujranwala',
+  'Hyderabad',
+  'Bahawalpur',
+  'Sargodha',
+  'Sukkur',
+  'Larkana',
+  'Sheikhupura',
+  'Rahim Yar Khan',
+  'Jhang',
+  'Dera Ghazi Khan',
+  'Gujrat',
+  'muzaffargarh',
+  'Other',
+] as const
+
+export type PakistanCity = typeof PAKISTAN_CITIES[number]

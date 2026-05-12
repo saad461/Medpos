@@ -207,3 +207,21 @@ export async function updatePOStatus(id: string, status: 'sent' | 'cancelled') {
   revalidatePath('/suppliers/purchase-orders')
   revalidatePath(`/suppliers/purchase-orders/${id}`)
 }
+
+export async function createSupplier(data: any) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const tenantId = user?.app_metadata.tenant_id
+  const { data: supplier, error } = await supabase.from('suppliers').insert({ ...data, tenant_id: tenantId }).select().single()
+  if (error) throw error
+  revalidatePath('/suppliers')
+  return supplier
+}
+
+export async function updateSupplier(id: string, data: any) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('suppliers').update(data).eq('id', id)
+  if (error) throw error
+  revalidatePath('/suppliers')
+  revalidatePath(`/suppliers/${id}`)
+}
