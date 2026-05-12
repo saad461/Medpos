@@ -3,10 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 import {
   fetchDRAPPrices,
   findBestMatch,
-  notifyAllStoresOfDRAPUpdate,
   sendDRAPSyncEmail,
   sendDRAPSyncFailureEmail
 } from '@/lib/medicines/drap-sync';
+import { createNotificationsForAllTenants, NOTIFICATION_TYPES } from '@/lib/notifications/create';
+import { sendDRAPUpdateEmail } from '@/lib/notifications/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -78,7 +79,31 @@ export async function GET(request: NextRequest) {
     await sendDRAPSyncEmail(results);
 
     // 5. Create in-app notification for all store owners
-    await notifyAllStoresOfDRAPUpdate(results.prices_updated);
+    if (results.prices_updated > 0) {
+      await createNotificationsForAllTenants({
+        type: NOTIFICATION_TYPES.DRAP_UPDATE,
+        title: 'DRAP Price Update',
+        message: `${results.prices_updated} medicine prices were updated by DRAP this month. Review your prices if adjustment is needed.`,
+        data: { updated_count: results.prices_updated },
+      });
+
+      // 6. Send emails to all active tenants
+      const { data: tenants } = await supabase
+        .from('tenants')
+        .select('name, owner_email')
+        .eq('status', 'active');
+
+      if (tenants) {
+        for (const tenant of tenants) {
+          await sendDRAPUpdateEmail({
+            storeName: tenant.name,
+            ownerEmail: tenant.owner_email,
+            updatedCount: results.prices_updated,
+            changedMedicines: [],
+          });
+        }
+      }
+    }
 
     return NextResponse.json({ success: true, results });
 

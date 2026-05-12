@@ -1,13 +1,14 @@
- ⨯ Failed to start server
-Error: listen EADDRINUSE: address already in use :::3000
-    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
-    at listenInCluster (node:net:1997:12)
-    at Server.listen (node:net:2102:7)
-    at /app/node_modules/next/dist/server/lib/start-server.js:280:16
-    at new Promise (<anonymous>)
-    at startServer (/app/node_modules/next/dist/server/lib/start-server.js:191:11)
-    at /app/node_modules/next/dist/server/ ○ Compiling /middleware ...
- ✓ Compiled /middleware in 1322ms (183 modules)
+
+> temp-init@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.16
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 1856ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1244ms (183 modules)
  ⨯ Error: Your project's URL and Key are required to create a Supabase client!
 
 Check your Supabase project's API settings to find these values
@@ -25,11 +26,6 @@ https://supabase.com/dashboard/project/_/settings/api
     at NoopContextManager.with (webpack-internal:///(middleware)/./node_modules/@opentelemetry/api/build/esm/context/NoopContextManager.js:16:19)
     at ContextAPI.with (webpack-internal:///(middleware)/./node_modules/@opentelemetry/api/build/esm/api/context.js:55:46)
  ○ Compiling /_error ...
- ✓ Compiled /_error in 1652ms (254 modules)
+ ✓ Compiled /_error in 1625ms (254 modules)
 <w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (101kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
 <w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (231kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
- ✓ Compiled in 591ms (435 modules)
- ✓ Compiled in 271ms (435 modules)
- ✓ Compiled in 239ms (435 modules)
- ✓ Compiled in 267ms (435 modules)
- ✓ Compiled in 390ms (435 modules)

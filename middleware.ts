@@ -94,7 +94,21 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/pending-approval', request.url))
     }
     if (tenant.status === 'suspended') {
-      return NextResponse.redirect(new URL('/suspended', request.url))
+      // Allow access to billing page to renew
+      const allowedSuspendedPaths = [
+        '/dashboard/settings/billing',
+        '/suspended',
+        '/api/settings/billing',
+        '/api/checkout',
+      ]
+
+      const isAllowedPath = allowedSuspendedPaths.some(path =>
+        pathname.startsWith(path)
+      )
+
+      if (!isAllowedPath) {
+        return NextResponse.redirect(new URL('/suspended', request.url))
+      }
     }
     if (tenant.status === 'cancelled') {
       return NextResponse.redirect(new URL('/pricing', request.url))
