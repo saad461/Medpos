@@ -25,11 +25,7 @@ import {
 import { toast } from 'sonner'
 import { createSupplier, updateSupplier } from '@/lib/suppliers/actions'
 import { Loader2 } from 'lucide-react'
-
-const PAKISTAN_CITIES = [
-  'Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad',
-  'Multan', 'Peshawar', 'Quetta', 'Sialkot', 'Gujranwala', 'Other'
-]
+import { PAKISTAN_CITIES } from '@/lib/constants'
 
 const supplierSchema = z.object({
   name: z.string().min(2, 'Company name is required'),

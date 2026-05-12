@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { Suspense } from 'react'
 import { Plus, Download, Users, UserPlus, CreditCard, TrendingUp } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'

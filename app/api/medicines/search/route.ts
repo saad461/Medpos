@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { buildSearchQuery, formatMedicineResult } from '@/lib/medicines/search';
 import { Database } from '@/types';
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ results: [], total: 0 }, { status: 400 });
   }
 
-  const supabase = createRouteHandlerClient<Database>({ cookies });
+  const supabase = await createClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {

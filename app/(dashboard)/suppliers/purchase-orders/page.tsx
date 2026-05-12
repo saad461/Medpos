@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { Plus, ShoppingBag, Truck, PackageCheck, LayoutDashboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'

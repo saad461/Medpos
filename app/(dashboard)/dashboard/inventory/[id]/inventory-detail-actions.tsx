@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit, PlusMinus, MoreVertical, Trash2 } from 'lucide-react';
+import { Edit, ArrowUpDown, MoreVertical, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -28,7 +28,7 @@ export function InventoryDetailActions({ item }: { item: any }) {
         </Link>
       </Button>
       <Button variant="outline" onClick={() => setShowAdjust(true)}>
-        <PlusMinus className="w-4 h-4 mr-2" />
+        <ArrowUpDown className="w-4 h-4 mr-2" />
         Adjust Stock
       </Button>
       <DropdownMenu>

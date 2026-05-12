@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Edit, PlusMinus, Eye, Trash2, ExternalLink, AlertCircle } from 'lucide-react';
+import { MoreHorizontal, Edit, ArrowUpDown, Eye, Trash2, ExternalLink, AlertCircle } from 'lucide-react';
 import { StockBadge } from './stock-badge';
 import { formatPKR, cn } from '@/lib/utils';
 import { differenceInDays, format } from 'date-fns';
@@ -193,7 +193,7 @@ export function MedicineTable({ searchParams }: { searchParams: Record<string, s
                         Edit Medicine
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => { setSelectedItem(item); setShowAdjust(true); }}>
-                        <PlusMinus className="mr-2 h-4 w-4" />
+                        <ArrowUpDown className="mr-2 h-4 w-4" />
                         Adjust Stock
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
