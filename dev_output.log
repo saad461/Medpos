@@ -24,3 +24,7 @@ warn - If this is content and not a class, replace it with `delay-&lsqb;1600ms&r
  ✓ Compiled in 1588ms (451 modules)
  ✓ Compiled in 459ms (451 modules)
  ✓ Compiled in 530ms (451 modules)
+ ✓ Compiled in 5.8s (451 modules)
+ ✓ Compiled in 622ms (451 modules)
+ ✓ Compiled in 735ms (451 modules)
+ ✓ Compiled in 522ms (451 modules)

@@ -61,6 +61,18 @@ export function NotificationCenter() {
     }
   }
 
+  const clearRead = async () => {
+    setIsActionLoading(true)
+    try {
+      await fetch('/api/notifications', { method: 'DELETE' })
+      setNotifications(prev => prev.filter(n => !n.is_read))
+    } catch (error) {
+      console.error('Failed to clear read notifications:', error)
+    } finally {
+      setIsActionLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -87,6 +99,16 @@ export function NotificationCenter() {
               <CheckCheck className="mr-2 h-4 w-4" />
             )}
             Mark all read
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-slate-500"
+            onClick={clearRead}
+            disabled={isActionLoading || !notifications.some(n => n.is_read)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Clear all read
           </Button>
         </div>
       </div>
