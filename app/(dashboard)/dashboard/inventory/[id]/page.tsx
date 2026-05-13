@@ -11,6 +11,7 @@ import { format, differenceInDays } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MEDICINE_CATEGORIES } from '@/lib/medicines/categories';
 import { InventoryDetailActions } from './inventory-detail-actions';
+import { SubmissionSection } from './submission-section';
 
 export default async function MedicineDetailPage({
   params,
@@ -242,22 +243,10 @@ export default async function MedicineDetailPage({
             </CardContent>
           </Card>
 
-          {item.medicine.scope === 'private' && (
-            <Card className="shadow-sm border-dashed border-primary/30 bg-primary/5">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto">
-                  <Package className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-primary text-sm">Contribute to Global DB</h4>
-                  <p className="text-[10px] text-slate-500 mt-1 leading-relaxed px-4">
-                    Is this medicine accurate? Submit it for review to make it available to all Pakistani pharmacies.
-                  </p>
-                </div>
-                <Button className="w-full font-bold">Submit for Review</Button>
-              </CardContent>
-            </Card>
-          )}
+          <SubmissionSection
+            medicine={item.medicine}
+            storeMedicineId={item.id}
+          />
         </div>
       </div>
     </div>

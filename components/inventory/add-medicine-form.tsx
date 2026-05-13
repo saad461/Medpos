@@ -35,6 +35,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { formatPKR, cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Medicine } from '@/types';
+import { useRouter } from 'next/navigation';
 
 const storeMedicineSchema = z.object({
   sale_price: z.coerce.number().positive('Sale price must be positive'),
@@ -57,6 +58,7 @@ const customMedicineSchema = storeMedicineSchema.extend({
 });
 
 export function AddMedicineForm({ mode }: { mode: 'search' | 'custom' }) {
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState<Medicine[]>([]);
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
@@ -111,15 +113,21 @@ export function AddMedicineForm({ mode }: { mode: 'search' | 'custom' }) {
     setSubmitting(true);
     try {
        let result: { id?: string; error?: string };
+       let medicineId: string | null = null;
+       let isSubmittedGlobal = false;
+
       if (mode === 'search' && selectedMedicine) {
+        medicineId = selectedMedicine.id;
         const res = await fetch('/api/inventory', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ ...values, medicine_id: selectedMedicine.id }),
+           body: JSON.stringify({ ...values, medicine_id: medicineId }),
         });
          result = await res.json() as { id?: string; error?: string };
       } else {
          const customValues = values as z.infer<typeof customMedicineSchema>;
+         isSubmittedGlobal = customValues.submit_global;
+
         // First create private medicine
         const medRes = await fetch('/api/medicines', {
           method: 'POST',
@@ -131,17 +139,18 @@ export function AddMedicineForm({ mode }: { mode: 'search' | 'custom' }) {
              company: customValues.company,
              unit: customValues.unit,
              is_controlled: customValues.is_controlled,
-             scope: customValues.submit_global ? 'pending_review' : 'private'
+             scope: isSubmittedGlobal ? 'pending_review' : 'private'
           }),
         });
          const medJson = await medRes.json() as { id: string, error?: string };
         if (medRes.ok) {
+          medicineId = medJson.id;
           // Then add to inventory
           const res = await fetch('/api/inventory', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              medicine_id: medJson.id,
+              medicine_id: medicineId,
               sale_price: values.sale_price,
               purchase_price: values.purchase_price,
               stock_qty: values.stock_qty,
@@ -152,6 +161,26 @@ export function AddMedicineForm({ mode }: { mode: 'search' | 'custom' }) {
             }),
           });
            result = await res.json() as { id?: string; error?: string };
+
+           if (res.ok && isSubmittedGlobal) {
+              // Create submission record via the API route
+              await fetch('/api/inventory/submit-global', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    medicine_id: medicineId,
+                    store_medicine_id: result.id,
+                    updated_data: {
+                        name: customValues.name,
+                        generic_name: customValues.generic_name,
+                        category: customValues.category,
+                        company: customValues.company,
+                        unit: customValues.unit,
+                        is_controlled: customValues.is_controlled,
+                    }
+                }),
+              });
+           }
         } else {
            throw new Error(medJson.error || 'Failed to create medicine');
         }
@@ -160,7 +189,16 @@ export function AddMedicineForm({ mode }: { mode: 'search' | 'custom' }) {
       if (result.error) {
         toast.error(result.error);
       } else {
-         toast.success(`${mode === 'search' ? selectedMedicine?.name : values.name} added to inventory!`);
+         if (mode === 'custom' && isSubmittedGlobal) {
+            toast.success("Medicine added and submitted for review!");
+            router.push('/dashboard/inventory/submissions');
+         } else {
+            toast.success(`${mode === 'search' ? selectedMedicine?.name : (values as any).name} added to inventory!`);
+            if (mode === 'custom') {
+                toast.info("Submit to global database later to help other pharmacies.");
+            }
+            router.push('/dashboard/inventory');
+         }
         reset();
         setSelectedMedicine(null);
         setSearch('');
@@ -422,11 +460,21 @@ export function AddMedicineForm({ mode }: { mode: 'search' | 'custom' }) {
 
           <div className="flex items-center space-x-2 p-4 bg-primary/5 rounded-xl border border-primary/10">
             <Checkbox id="submit_global" onCheckedChange={(c) => setValue('submit_global', !!c)} />
-            <div className="grid gap-1.5 leading-none">
+            <div className="grid gap-1.5 leading-none flex-1">
               <Label htmlFor="submit_global" className="text-sm font-bold cursor-pointer text-primary">Submit to Global Database</Label>
               <p className="text-[10px] text-slate-500">Help other pharmacies by contributing this medicine to our shared database.</p>
             </div>
+            {watch('submit_global') && (
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px] animate-pulse">
+                    Review Pending on Save
+                </Badge>
+            )}
           </div>
+          {watch('submit_global') && (
+              <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded border border-amber-100">
+                  ⚠️ This medicine will be submitted for review immediately after saving.
+              </p>
+          )}
 
           <Button type="submit" size="lg" className="w-full font-bold h-12 shadow-md" disabled={submitting}>
             {submitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Plus className="w-5 h-5 mr-2" />}

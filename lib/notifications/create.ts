@@ -13,6 +13,7 @@ export const NOTIFICATION_TYPES = {
   ACCOUNT_APPROVED: 'account_approved',
   NEW_TEAM_MEMBER: 'new_team_member',
   STOCK_RECEIVED: 'stock_received',
+  MEDICINE_SUBMISSION_RECEIVED: 'medicine_submission_received',
 } as const
 
 export type NotificationType = typeof NOTIFICATION_TYPES[keyof typeof NOTIFICATION_TYPES]
@@ -30,6 +31,7 @@ export const NOTIFICATION_ICONS: Record<NotificationType, string> = {
   account_approved: '🎉',
   new_team_member: '👥',
   stock_received: '📥',
+  medicine_submission_received: '🔬',
 }
 
 export const NOTIFICATION_COLORS: Record<NotificationType, string> = {
@@ -45,6 +47,7 @@ export const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   account_approved: 'success',
   new_team_member: 'accent',
   stock_received: 'success',
+  medicine_submission_received: 'accent',
 }
 
 export const NOTIFICATION_NAVIGATION: Record<NotificationType, string> = {
@@ -60,6 +63,7 @@ export const NOTIFICATION_NAVIGATION: Record<NotificationType, string> = {
   account_approved:       '/dashboard',
   new_team_member:        '/dashboard/settings/users',
   stock_received:         '/dashboard/inventory/adjustments',
+  medicine_submission_received: '/admin/medicines/pending',
 }
 
 export interface CreateNotificationInput {
