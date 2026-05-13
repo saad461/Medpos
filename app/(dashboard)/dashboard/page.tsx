@@ -21,6 +21,12 @@ import { ExpiryWidget } from '@/components/inventory/expiry-widget';
 import { LowStockWidget } from '@/components/inventory/low-stock-widget';
 import { formatPKR, cn } from '@/lib/utils';
 import { Logo } from '@/components/shared/logo';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dashboard | MedPOS',
+  description: 'Overview of your pharmacy performance.',
+};
 
 export default async function DashboardPage() {
   const supabase = createServerComponentClient<Database>({ cookies });

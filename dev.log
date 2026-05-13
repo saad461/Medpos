@@ -31,3 +31,10 @@ warn - If this is content and not a class, replace it with `delay-&lsqb;1600ms&r
  GET /login 200 in 41ms
  GET /login 200 in 47ms
  GET /login 200 in 40ms
+ ✓ Compiled in 5.9s (451 modules)
+ ✓ Compiled in 927ms (451 modules)
+ ✓ Compiled in 721ms (451 modules)
+ ✓ Compiled in 566ms (451 modules)
+ ✓ Compiled in 589ms (451 modules)
+ ✓ Compiled in 481ms (451 modules)
+ ✓ Compiled in 520ms (451 modules)
