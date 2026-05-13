@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import {
+  getAuditLog,
   getSalesSummary,
   getTaxReport,
   getInventoryValuation,
@@ -16,11 +17,14 @@ import {
   generateTaxCSV,
   generateProfitCSV,
   generateShiftCSV,
-  generateSupplierCSV
+  generateSupplierCSV,
+  generateAuditCSV
 } from '@/lib/reports/csv'
 import { renderToStream } from '@react-pdf/renderer'
 import { ReportPDF, FBRTaxPDF } from '@/lib/reports/pdf'
 import React from 'react'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   try {
@@ -216,6 +220,9 @@ export async function GET(req: NextRequest) {
           />
         )
       }
+    } else if (type === 'audit') {
+      const logs = await getAuditLog(tenantId, dateRange, {})
+      csvData = generateAuditCSV(logs)
     }
 
     if (format === 'csv') {

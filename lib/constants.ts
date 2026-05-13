@@ -46,3 +46,14 @@ export const PAKISTAN_CITIES = [
 ] as const
 
 export type PakistanCity = typeof PAKISTAN_CITIES[number]
+
+// Help & Support Constants
+// TODO: Replace with actual MedPOS Urdu tutorial video ID before launch
+export const TUTORIAL_VIDEO_ID = 'dQw4w9WgXcQ'
+export const TUTORIAL_VIDEO_URL = `https://www.youtube.com/watch?v=${TUTORIAL_VIDEO_ID}`
+export const TUTORIAL_EMBED_URL = `https://www.youtube.com/embed/${TUTORIAL_VIDEO_ID}`
+
+export const SUPPORT_WHATSAPP = '923001234567' // TODO: Replace with real number
+export const SUPPORT_WHATSAPP_URL = `https://wa.me/${SUPPORT_WHATSAPP}`
+export const SUPPORT_EMAIL = 'support@medpos.pk'
+export const SUPPORT_HOURS = 'Monday - Saturday, 9 AM - 11 PM Pakistan Time'
