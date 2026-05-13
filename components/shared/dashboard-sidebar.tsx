@@ -8,6 +8,7 @@ import {
   Package,
   Users,
   Truck,
+  FlaskConical,
   BarChart3,
   Shield,
   Settings,
@@ -20,6 +21,9 @@ import { Logo } from './logo';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
+import { createClient } from '@/lib/supabase/client';
+import { useEffect, useState } from 'react';
+import { ContributorBadge } from '../inventory/contributor-badge';
 
 const sidebarLinks = [
   { group: 'MAIN', items: [
@@ -28,6 +32,7 @@ const sidebarLinks = [
   ]},
   { group: 'MANAGEMENT', items: [
     { name: 'Inventory', href: '/dashboard/inventory', icon: Package, badge: 0 },
+    { name: 'My Submissions', href: '/dashboard/inventory/submissions', icon: FlaskConical, badge: 0 },
     { name: 'Customers', href: '/dashboard/customers', icon: Users },
     { name: 'Suppliers', href: '/dashboard/suppliers', icon: Truck },
   ]},
@@ -44,18 +49,56 @@ const sidebarLinks = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
+  const [pendingCount, setPendingCount] = useState(0);
+  const supabase = createClient();
+
+  useEffect(() => {
+    if (!user?.tenant?.id) return;
+
+    async function fetchPendingCount() {
+      const { count } = await supabase
+        .from('medicines')
+        .select('*', { count: 'exact', head: true })
+        .eq('submitted_by', user?.tenant?.id)
+        .eq('scope', 'pending_review');
+
+      setPendingCount(count || 0);
+    }
+
+    fetchPendingCount();
+
+    // Subscribe to changes
+    const channel = supabase
+      .channel('pending-submissions')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'medicines',
+        filter: `submitted_by=eq.${user.tenant.id}`
+      }, () => fetchPendingCount())
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.tenant?.id, supabase]);
 
   return (
     <aside className="hidden lg:flex flex-col w-[260px] h-screen bg-white border-r border-slate-200 dark:bg-slate-900 dark:border-slate-800 shrink-0">
       <div className="p-6 flex flex-col gap-1">
         <Logo className="w-32 h-auto" />
-        <div className="flex items-center gap-2 mt-2">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider truncate">
-            {user?.tenant?.name || 'Loading Store...'}
-          </span>
-          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-slate-50 border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 capitalize">
-            {user?.tenant?.plan || 'Starter'}
-          </Badge>
+        <div className="flex flex-col gap-2 mt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider truncate">
+              {user?.tenant?.name || 'Loading Store...'}
+            </span>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-slate-50 border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 capitalize">
+              {user?.tenant?.plan || 'Starter'}
+            </Badge>
+          </div>
+          {user?.tenant?.id && (
+            <ContributorBadgeWrapper tenantId={user.tenant.id} />
+          )}
         </div>
       </div>
 
@@ -69,6 +112,8 @@ export function DashboardSidebar() {
               {group.items.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 const Icon = item.icon;
+
+                const badge = item.name === 'My Submissions' ? pendingCount : item.badge;
 
                 return (
                   <Link
@@ -84,9 +129,9 @@ export function DashboardSidebar() {
                   >
                     <Icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300")} />
                     <span className="text-sm">{item.name}</span>
-                    {item.badge !== undefined && item.badge > 0 && (
+                    {badge !== undefined && badge > 0 && (
                       <span className="ml-auto bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full dark:bg-amber-900/30 dark:text-amber-400">
-                        {item.badge}
+                        {badge}
                       </span>
                     )}
                   </Link>
@@ -121,4 +166,29 @@ export function DashboardSidebar() {
       </div>
     </aside>
   );
+}
+
+function ContributorBadgeWrapper({ tenantId }: { tenantId: string }) {
+  const [stats, setStats] = useState<{ count: number; isContributor: boolean } | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchStats() {
+      const { data } = await supabase
+        .from('store_settings')
+        .select('contributor_count, is_contributor')
+        .eq('tenant_id', tenantId)
+        .single();
+
+      if (data) {
+        setStats({ count: data.contributor_count, isContributor: data.is_contributor });
+      }
+    }
+
+    fetchStats();
+  }, [tenantId, supabase]);
+
+  if (!stats?.isContributor) return null;
+
+  return <ContributorBadge contributorCount={stats.count} isContributor={true} size="sm" />;
 }

@@ -8,6 +8,11 @@ import {
   sendSuspensionEmail,
   sendReactivationEmail
 } from '@/lib/email/templates'
+import { createAuditLog } from '@/lib/audit'
+import { createNotification, NOTIFICATION_TYPES } from '@/lib/notifications/create'
+import { Resend } from 'resend'
+import MedicineApprovedEmail from '@/emails/medicine-approved'
+import MedicineRejectedEmail from '@/emails/medicine-rejected'
 
 async function verifyAdminRole() {
   const supabase = await createClient()
@@ -162,32 +167,120 @@ export async function approveMedicine(medicineId: string, editedData?: any) {
   const adminUser = await verifyAdminRole()
   const supabase = await createClient(true)
 
+  // Get latest pending submission
+  const { data: submission } = await supabase
+    .from('medicine_submissions')
+    .select('*')
+    .eq('medicine_id', medicineId)
+    .eq('status', 'pending_review')
+    .order('submitted_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (!submission) throw new Error('No pending submission found')
+
   const updatePayload: any = { scope: 'global' }
   if (editedData) {
     if (editedData.name) updatePayload.name = editedData.name
     if (editedData.generic_name) updatePayload.generic_name = editedData.generic_name
     if (editedData.category) updatePayload.category = editedData.category
     if (editedData.company) updatePayload.company = editedData.company
+    if (editedData.unit) updatePayload.unit = editedData.unit
+    if (editedData.is_controlled !== undefined) updatePayload.is_controlled = editedData.is_controlled
   }
 
-  const { data: medicine } = await supabase
+  const { data: medicine, error: medicineError } = await supabase
     .from('medicines')
     .update(updatePayload)
     .eq('id', medicineId)
     .select()
     .single()
 
-  if (medicine?.submitted_by) {
-    // Notify tenant
-    await supabase.from('notifications').insert({
-      tenant_id: medicine.submitted_by,
-      type: 'medicine_approved',
-      title: 'Medicine Approved!',
-      message: `Your submission for ${medicine.name} has been approved and added to the global database.`,
-      data: { medicine_id: medicineId }
+  if (medicineError) throw medicineError
+
+  // Update submission record
+  await supabase
+    .from('medicine_submissions')
+    .update({
+      status: 'approved',
+      reviewed_by: adminUser.id,
+      reviewed_at: new Date().toISOString()
+    })
+    .eq('id', submission.id)
+
+  // Update contributor stats
+  const { data: settings } = await supabase
+    .from('store_settings')
+    .select('contributor_count, first_contribution_at')
+    .eq('tenant_id', submission.tenant_id)
+    .single()
+
+  const newContributorCount = (settings?.contributor_count || 0) + 1
+
+  await supabase
+    .from('store_settings')
+    .update({
+      contributor_count: newContributorCount,
+      is_contributor: true,
+      first_contribution_at: settings?.first_contribution_at || new Date().toISOString(),
+      last_contribution_at: new Date().toISOString()
+    })
+    .eq('tenant_id', submission.tenant_id)
+
+  // Notify store
+  await createNotification({
+    tenant_id: submission.tenant_id,
+    type: NOTIFICATION_TYPES.MEDICINE_APPROVED as any,
+    title: 'Medicine Approved! 🎉',
+    message: `${medicine.name} is now in the global database`,
+    data: { medicine_id: medicineId }
+  })
+
+  // Email to store owner
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('name, owner_email')
+    .eq('id', submission.tenant_id)
+    .single()
+
+  if (tenant && process.env.RESEND_API_KEY) {
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    await resend.emails.send({
+      from: process.env.EMAIL_FROM!,
+      to: tenant.owner_email,
+      subject: `✅ Medicine Approved — ${medicine.name} is now global!`,
+      react: MedicineApprovedEmail({
+        ownerName: tenant.name,
+        storeName: tenant.name,
+        ownerEmail: tenant.owner_email,
+        medicineName: medicine.name,
+        genericName: medicine.generic_name,
+        contributorCount: newContributorCount,
+        dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/inventory`,
+      })
     })
   }
 
+  // Audit log
+  await createAuditLog({
+    tenant_id: submission.tenant_id,
+    user_id: adminUser.id,
+    action: 'APPROVE_MEDICINE',
+    table_name: 'medicines',
+    record_id: medicineId,
+    old_value: {
+      scope: 'pending_review',
+      submission_id: submission.id,
+    },
+    new_value: {
+      scope: 'global',
+      reviewed_by: adminUser.id,
+      reviewed_at: new Date().toISOString(),
+      contributor_count_after: newContributorCount,
+    },
+  })
+
+  // Original admin action log
   await supabase.from('admin_actions').insert({
     admin_id: adminUser.id,
     action: 'MEDICINE_APPROVED',
@@ -198,6 +291,7 @@ export async function approveMedicine(medicineId: string, editedData?: any) {
 
   revalidatePath('/admin/medicines/pending')
   revalidatePath('/admin/medicines')
+  revalidatePath('/dashboard/inventory/submissions')
   return { success: true }
 }
 
@@ -205,22 +299,89 @@ export async function rejectMedicine(medicineId: string, reason: string) {
   const adminUser = await verifyAdminRole()
   const supabase = await createClient(true)
 
-  const { data: medicine } = await supabase
+  // Get latest pending submission
+  const { data: submission } = await supabase
+    .from('medicine_submissions')
+    .select('*')
+    .eq('medicine_id', medicineId)
+    .eq('status', 'pending_review')
+    .order('submitted_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (!submission) throw new Error('No pending submission found')
+
+  const { data: medicine, error: medicineError } = await supabase
     .from('medicines')
     .update({ scope: 'rejected' })
     .eq('id', medicineId)
     .select()
     .single()
 
-  if (medicine?.submitted_by) {
-    await supabase.from('notifications').insert({
-      tenant_id: medicine.submitted_by,
-      type: 'medicine_rejected',
-      title: 'Medicine Submission Update',
-      message: `Your submission for ${medicine.name} was not approved. Reason: ${reason}`,
-      data: { medicine_id: medicineId, reason }
+  if (medicineError) throw medicineError
+
+  // Update submission record
+  await supabase
+    .from('medicine_submissions')
+    .update({
+      status: 'rejected',
+      rejection_reason: reason,
+      reviewed_by: adminUser.id,
+      reviewed_at: new Date().toISOString()
+    })
+    .eq('id', submission.id)
+
+  // Notify store
+  await createNotification({
+    tenant_id: submission.tenant_id,
+    type: NOTIFICATION_TYPES.MEDICINE_REJECTED as any,
+    title: 'Submission Update',
+    message: `Your submission for ${medicine.name} was not approved`,
+    data: { reason, medicine_id: medicineId }
+  })
+
+  // Email to store owner
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('name, owner_email')
+    .eq('id', submission.tenant_id)
+    .single()
+
+  if (tenant && process.env.RESEND_API_KEY) {
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    await resend.emails.send({
+      from: process.env.EMAIL_FROM!,
+      to: tenant.owner_email,
+      subject: `Medicine Submission Update — ${medicine.name}`,
+      react: MedicineRejectedEmail({
+        ownerName: tenant.name,
+        storeName: tenant.name,
+        ownerEmail: tenant.owner_email,
+        medicineName: medicine.name,
+        rejectionReason: reason,
+        resubmitUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/dashboard/inventory/submissions`,
+      })
     })
   }
+
+  // Audit log
+  await createAuditLog({
+    tenant_id: submission.tenant_id,
+    user_id: adminUser.id,
+    action: 'REJECT_MEDICINE',
+    table_name: 'medicines',
+    record_id: medicineId,
+    old_value: {
+      scope: 'pending_review',
+      submission_id: submission.id,
+    },
+    new_value: {
+      scope: 'rejected',
+      rejection_reason: reason,
+      reviewed_by: adminUser.id,
+      reviewed_at: new Date().toISOString(),
+    },
+  })
 
   await supabase.from('admin_actions').insert({
     admin_id: adminUser.id,
@@ -232,6 +393,7 @@ export async function rejectMedicine(medicineId: string, reason: string) {
   })
 
   revalidatePath('/admin/medicines/pending')
+  revalidatePath('/dashboard/inventory/submissions')
   return { success: true }
 }
 

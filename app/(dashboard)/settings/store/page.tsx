@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { SettingsLayout } from '@/components/settings/settings-layout'
 import { StoreForm } from '@/components/settings/store-form'
 import { LogoUpload } from '@/components/settings/logo-upload'
+import { ContributorBadge } from '@/components/inventory/contributor-badge'
 
 export default async function StoreSettingsPage() {
   const supabase = await createClient()
@@ -48,10 +49,19 @@ export default async function StoreSettingsPage() {
         </div>
 
         <div className="grid gap-8">
-          <LogoUpload
-            currentLogoUrl={settings.logo_url}
-            storeName={tenant.name}
-          />
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 border rounded-xl bg-slate-50/50">
+            <LogoUpload
+              currentLogoUrl={settings.logo_url}
+              storeName={tenant.name}
+            />
+            {settings.is_contributor && (
+              <ContributorBadge
+                contributorCount={settings.contributor_count}
+                isContributor={true}
+                size="md"
+              />
+            )}
+          </div>
           <StoreForm settings={settings as any} tenant={tenant as any} />
         </div>
       </div>
