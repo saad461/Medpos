@@ -146,6 +146,11 @@ export async function GET(request: Request) {
           planName: sub.plan,
           renewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/billing`,
         })
+        await createNotificationForAllUsers(sub.tenant_id, {
+          type: NOTIFICATION_TYPES.SUBSCRIPTION_EXPIRED,
+          title: 'Subscription Expired',
+          message: `Your ${sub.plan} plan has expired and your dashboard access has been suspended.`,
+        })
         results.expired_suspended++
       }
     }

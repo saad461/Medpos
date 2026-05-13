@@ -1,6 +1,6 @@
 'use client'
 
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
@@ -62,7 +62,8 @@ export function NotificationItem({
       )}
     >
       <div className={cn(
-        'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl',
+        'shrink-0 items-center justify-center rounded-full text-xl flex',
+        variant === 'compact' ? 'h-10 w-10' : 'h-12 w-12 text-2xl',
         colorClasses[color as keyof typeof colorClasses]
       )}>
         {icon}
@@ -71,13 +72,16 @@ export function NotificationItem({
       <div className="flex flex-1 flex-col gap-1 overflow-hidden">
         <div className="flex items-center justify-between gap-2">
           <p className={cn(
-            'text-sm leading-none',
+            variant === 'compact' ? 'text-sm' : 'text-base',
+            'leading-none',
             notification.is_read ? 'font-medium text-slate-900' : 'font-semibold text-slate-900'
           )}>
             {notification.title}
           </p>
           <span className="text-[10px] text-slate-400 whitespace-nowrap">
-            {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+            {variant === 'compact'
+              ? formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })
+              : format(new Date(notification.created_at), 'dd MMM yyyy, h:mm b')}
           </span>
         </div>
         <p className={cn(
