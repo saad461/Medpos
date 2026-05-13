@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient, startOfDay, logCronRun } from '@/lib/cron/helpers'
+import { createNotification, NOTIFICATION_TYPES } from '@/lib/notifications/create'
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
@@ -71,6 +72,28 @@ export async function GET(request: Request) {
       .eq('tenant_id', tenantId)
       .gte('created_at', todayStart)
     results.notifications_deleted = notifCount || 0
+
+    // ADD for Step 14: also reset is_read status on older notifications
+    await supabase
+      .from('notifications')
+      .update({ is_read: false })
+      .eq('tenant_id', tenantId)
+      .lt('created_at', todayStart)
+
+    // After reset, create fresh demo notifications
+    await createNotification({
+      tenant_id: tenantId,
+      type: NOTIFICATION_TYPES.EXPIRY_ALERT,
+      title: '3 medicines expiring this week',
+      message: 'Augmentin 625mg, Insulin Mixtard, Azithromycin 500mg',
+    })
+
+    await createNotification({
+      tenant_id: tenantId,
+      type: NOTIFICATION_TYPES.LOW_STOCK,
+      title: '2 medicines below reorder level',
+      message: 'ORS Sachet (3 left), Ciprofloxacin 500mg (5 left)',
+    })
 
     // 5. Delete today's credit transactions (from Step 13)
     const { count: transCount } = await supabase

@@ -6,26 +6,21 @@
   - Local:        http://localhost:3000
 
  ✓ Starting...
- ✓ Ready in 1856ms
+ ✓ Ready in 1851ms
  ○ Compiling /middleware ...
- ✓ Compiled /middleware in 1244ms (183 modules)
- ⨯ Error: Your project's URL and Key are required to create a Supabase client!
+ ✓ Compiled /middleware in 1314ms (183 modules)
+ ○ Compiling /login ...
 
-Check your Supabase project's API settings to find these values
+warn - The class `delay-[1400ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `delay-&lsqb;1400ms&rsqb;` to silence this warning.
 
-https://supabase.com/dashboard/project/_/settings/api
-    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
-    at createServerClient (webpack-internal:///(middleware)/./node_modules/@supabase/ssr/dist/module/createServerClient.js:18:15)
-    at updateSession (webpack-internal:///(middleware)/./lib/supabase/middleware.ts:13:87)
-    at Object.middleware [as handler] (webpack-internal:///(middleware)/./middleware.ts:33:121)
-    at eval (webpack-internal:///(middleware)/./node_modules/next/dist/esm/server/web/adapter.js:197:31)
-    at AsyncLocalStorage.run (node:internal/async_local_storage/async_hooks:91:14)
-    at Object.wrap (webpack-internal:///(middleware)/./node_modules/next/dist/esm/server/async-storage/request-async-storage-wrapper.js:105:24)
-    at eval (webpack-internal:///(middleware)/./node_modules/next/dist/esm/server/web/adapter.js:188:122)
-    at eval (webpack-internal:///(middleware)/./node_modules/next/dist/esm/server/lib/trace/tracer.js:115:36)
-    at NoopContextManager.with (webpack-internal:///(middleware)/./node_modules/@opentelemetry/api/build/esm/context/NoopContextManager.js:16:19)
-    at ContextAPI.with (webpack-internal:///(middleware)/./node_modules/@opentelemetry/api/build/esm/api/context.js:55:46)
- ○ Compiling /_error ...
- ✓ Compiled /_error in 1625ms (254 modules)
+warn - The class `delay-[1600ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `delay-&lsqb;1600ms&rsqb;` to silence this warning.
+ ✓ Compiled /login in 7s (960 modules)
+ GET /login 200 in 7766ms
+ ✓ Compiled in 816ms (451 modules)
 <w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (101kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
 <w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (231kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled in 1588ms (451 modules)
+ ✓ Compiled in 459ms (451 modules)
+ ✓ Compiled in 530ms (451 modules)

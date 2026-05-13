@@ -115,8 +115,9 @@ async function processExpiryAlertsForTenant(tenant: any, supabase: any, results:
     results.emails_sent++
   }
 
-  // In-app notifications
+  // In-app notifications with deduplication
   if (expired.length > 0) {
+    // Expired medicines: every day until disposed
     await createNotificationForAllUsers(tenant.id, {
       type: NOTIFICATION_TYPES.EXPIRY_ALERT,
       title: `${expired.length} medicine(s) have expired`,
@@ -127,23 +128,46 @@ async function processExpiryAlertsForTenant(tenant: any, supabase: any, results:
   }
 
   if (next7.length > 0) {
-    await createNotificationForAllUsers(tenant.id, {
-      type: NOTIFICATION_TYPES.EXPIRY_ALERT,
-      title: `${next7.length} medicine(s) expiring in 7 days`,
-      message: `${next7.map((m: any) => m.medicines.name).slice(0, 3).join(', ')}${next7.length > 3 ? ` and ${next7.length - 3} more` : ''}`,
-      data: { expiring_count: next7.length, days: 7 },
-    })
-    results.notifications_created++
+    // Expiring in 7 days: ONCE (check if already exists today)
+    const { data: existing } = await supabase
+      .from('notifications')
+      .select('id')
+      .eq('tenant_id', tenant.id)
+      .eq('type', NOTIFICATION_TYPES.EXPIRY_ALERT)
+      .eq('data->>days', '7')
+      .gte('created_at', startOfDay(new Date()).toISOString())
+      .limit(1)
+
+    if (!existing || existing.length === 0) {
+      await createNotificationForAllUsers(tenant.id, {
+        type: NOTIFICATION_TYPES.EXPIRY_ALERT,
+        title: `${next7.length} medicine(s) expiring in 7 days`,
+        message: `${next7.map((m: any) => m.medicines.name).slice(0, 3).join(', ')}${next7.length > 3 ? ` and ${next7.length - 3} more` : ''}`,
+        data: { expiring_count: next7.length, days: 7 },
+      })
+      results.notifications_created++
+    }
   }
 
   // 30-day alerts only on Mondays
   if (isMonday && next30.length > 0) {
-    await createNotificationForAllUsers(tenant.id, {
-      type: NOTIFICATION_TYPES.EXPIRY_ALERT,
-      title: `${next30.length} medicine(s) expiring this month`,
-      message: `${next30.map((m: any) => m.medicines.name).slice(0, 3).join(', ')}${next30.length > 3 ? ` and ${next30.length - 3} more` : ''}`,
-      data: { expiring_count: next30.length, days: 30 },
-    })
-    results.notifications_created++
+    const { data: existing } = await supabase
+      .from('notifications')
+      .select('id')
+      .eq('tenant_id', tenant.id)
+      .eq('type', NOTIFICATION_TYPES.EXPIRY_ALERT)
+      .eq('data->>days', '30')
+      .gte('created_at', startOfDay(new Date()).toISOString())
+      .limit(1)
+
+    if (!existing || existing.length === 0) {
+      await createNotificationForAllUsers(tenant.id, {
+        type: NOTIFICATION_TYPES.EXPIRY_ALERT,
+        title: `${next30.length} medicine(s) expiring this month`,
+        message: `${next30.map((m: any) => m.medicines.name).slice(0, 3).join(', ')}${next30.length > 3 ? ` and ${next30.length - 3} more` : ''}`,
+        data: { expiring_count: next30.length, days: 30 },
+      })
+      results.notifications_created++
+    }
   }
 }

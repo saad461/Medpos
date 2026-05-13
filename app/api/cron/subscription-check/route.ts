@@ -60,13 +60,25 @@ export async function GET(request: Request) {
         daysLeft: 7,
         renewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/billing`,
       })
-      await createNotificationForAllUsers(sub.tenant_id, {
-        type: NOTIFICATION_TYPES.SUBSCRIPTION_EXPIRING,
-        title: 'Subscription expiring in 7 days',
-        message: `Your ${sub.plan} plan expires on ${formatDate(sub.period_end)}. Renew to avoid interruption.`,
-        data: { days_left: 7, period_end: sub.period_end },
-      })
-      results.expiring_7_day++
+
+      const { data: existing } = await supabase
+        .from('notifications')
+        .select('id')
+        .eq('tenant_id', sub.tenant_id)
+        .eq('type', NOTIFICATION_TYPES.SUBSCRIPTION_EXPIRING)
+        .eq('data->>days_left', '7')
+        .gte('created_at', startOfDay(new Date()).toISOString())
+        .limit(1)
+
+      if (!existing || existing.length === 0) {
+        await createNotificationForAllUsers(sub.tenant_id, {
+          type: NOTIFICATION_TYPES.SUBSCRIPTION_EXPIRING,
+          title: 'Subscription expiring in 7 days',
+          message: `Your ${sub.plan} plan expires on ${formatDate(sub.period_end)}. Renew to avoid interruption.`,
+          data: { days_left: 7, period_end: sub.period_end },
+        })
+        results.expiring_7_day++
+      }
     }
 
     // 2. Find subscriptions expiring in exactly 1 day
@@ -87,13 +99,25 @@ export async function GET(request: Request) {
         daysLeft: 1,
         renewUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings/billing`,
       })
-      await createNotificationForAllUsers(sub.tenant_id, {
-        type: NOTIFICATION_TYPES.SUBSCRIPTION_EXPIRING,
-        title: '⚠️ Subscription expires TOMORROW',
-        message: 'Renew your subscription today to avoid losing dashboard access.',
-        data: { days_left: 1, period_end: sub.period_end },
-      })
-      results.expiring_1_day++
+
+      const { data: existing } = await supabase
+        .from('notifications')
+        .select('id')
+        .eq('tenant_id', sub.tenant_id)
+        .eq('type', NOTIFICATION_TYPES.SUBSCRIPTION_EXPIRING)
+        .eq('data->>days_left', '1')
+        .gte('created_at', startOfDay(new Date()).toISOString())
+        .limit(1)
+
+      if (!existing || existing.length === 0) {
+        await createNotificationForAllUsers(sub.tenant_id, {
+          type: NOTIFICATION_TYPES.SUBSCRIPTION_EXPIRING,
+          title: '⚠️ Subscription expires TOMORROW',
+          message: 'Renew your subscription today to avoid losing dashboard access.',
+          data: { days_left: 1, period_end: sub.period_end },
+        })
+        results.expiring_1_day++
+      }
     }
 
     // 3. Find expired subscriptions — suspend tenant (with 2 day buffer)
