@@ -18,6 +18,8 @@ export function NotificationBell() {
   const [notifications, setNotifications] = useState<any[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
+  const [shouldAnimate, setShouldAnimate] = useState(false)
+  const prevUnreadCount = useRef(0)
   const intervalRef = useRef<any>(null)
 
   const fetchNotifications = async () => {
@@ -32,6 +34,15 @@ export function NotificationBell() {
       console.error('Failed to fetch notifications:', error)
     }
   }
+
+  useEffect(() => {
+    if (unreadCount > prevUnreadCount.current) {
+      setShouldAnimate(true)
+      const timer = setTimeout(() => setShouldAnimate(false), 1000)
+      return () => clearTimeout(timer)
+    }
+    prevUnreadCount.current = unreadCount
+  }, [unreadCount])
 
   useEffect(() => {
     fetchNotifications()
@@ -88,9 +99,9 @@ export function NotificationBell() {
           className="relative h-9 w-9 rounded-full"
         >
           {unreadCount > 0 ? (
-            <BellRing className="h-5 w-5 text-slate-600 animate-ring" />
+            <BellRing className={cn("h-5 w-5 text-slate-600", shouldAnimate && "animate-ring")} />
           ) : (
-            <Bell className="h-5 w-5 text-slate-600" />
+            <Bell className={cn("h-5 w-5 text-slate-600", shouldAnimate && "animate-ring")} />
           )}
           {unreadCount > 0 && (
             <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
@@ -152,7 +163,7 @@ export function NotificationBell() {
 
         <div className="border-t border-slate-100 p-3 text-center">
           <Link
-            href="/notifications"
+            href="/dashboard/notifications"
             className="text-xs font-medium text-sky-600 hover:text-sky-700"
             onClick={() => setIsOpen(false)}
           >
@@ -163,16 +174,14 @@ export function NotificationBell() {
 
       <style jsx global>{`
         @keyframes ring {
-          0% { transform: rotate(0deg); }
-          10% { transform: rotate(15deg); }
-          20% { transform: rotate(-15deg); }
-          30% { transform: rotate(15deg); }
+          0%, 100% { transform: rotate(0deg); }
+          20% { transform: rotate(15deg); }
           40% { transform: rotate(-15deg); }
-          50% { transform: rotate(0deg); }
-          100% { transform: rotate(0deg); }
+          60% { transform: rotate(10deg); }
+          80% { transform: rotate(-10deg); }
         }
         .animate-ring {
-          animation: ring 2s ease infinite;
+          animation: ring 0.8s ease-in-out;
         }
       `}</style>
     </Popover>

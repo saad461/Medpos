@@ -93,18 +93,28 @@ async function processLowStockForTenant(tenant: any, supabase: any, results: any
   })
   results.emails_sent++
 
-  // Create in-app notification
+  // Create in-app notification with deduplication (already handled by cron only running on Mondays, but extra safety)
   const totalCount = filteredLowStock.length
-  await createNotificationForAllUsers(tenant.id, {
-    type: outOfStock.length > 0 ? NOTIFICATION_TYPES.OUT_OF_STOCK : NOTIFICATION_TYPES.LOW_STOCK,
-    title: `Weekly Stock Alert: ${totalCount} medicine(s) need reordering`,
-    message: `${outOfStock.length} out of stock, ${lowStock.length} below reorder level`,
-    data: {
-      out_of_stock_count: outOfStock.length,
-      low_stock_count: lowStock.length,
-    },
-  })
-  results.notifications_created++
+  const { data: existing } = await supabase
+    .from('notifications')
+    .select('id')
+    .eq('tenant_id', tenant.id)
+    .in('type', [NOTIFICATION_TYPES.LOW_STOCK, NOTIFICATION_TYPES.OUT_OF_STOCK])
+    .gte('created_at', startOfDay(new Date()).toISOString())
+    .limit(1)
+
+  if (!existing || existing.length === 0) {
+    await createNotificationForAllUsers(tenant.id, {
+      type: outOfStock.length > 0 ? NOTIFICATION_TYPES.OUT_OF_STOCK : NOTIFICATION_TYPES.LOW_STOCK,
+      title: `Weekly Stock Alert: ${totalCount} medicine(s) need reordering`,
+      message: `${outOfStock.length} out of stock, ${lowStock.length} below reorder level`,
+      data: {
+        out_of_stock_count: outOfStock.length,
+        low_stock_count: lowStock.length,
+      },
+    })
+    results.notifications_created++
+  }
 
   // Auto-email suppliers
   await notifySuppliers(tenant, filteredLowStock, supabase)
