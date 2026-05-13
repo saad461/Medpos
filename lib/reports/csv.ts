@@ -14,6 +14,18 @@ export function generateSalesCSV(sales: any[]): string {
   return Papa.unparse(data)
 }
 
+export function generateAuditCSV(logs: any[]): string {
+  const data = logs.map(l => ({
+    'Date & Time': formatPKDateTime(l.created_at),
+    'User': l.users?.name || 'System',
+    'Action': l.action,
+    'Description': l.description,
+    'Table': l.table_name,
+    'IP Address': l.ip_address,
+  }))
+  return Papa.unparse(data)
+}
+
 export function generateInventoryCSV(medicines: any[]): string {
   const data = medicines.map(m => ({
     'Medicine Name': m.medicines?.name || m.name,
