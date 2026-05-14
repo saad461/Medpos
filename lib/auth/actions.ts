@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/cron/helpers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
@@ -36,12 +37,12 @@ export async function signUpWithEmail(formData: z.infer<typeof signupSchema>) {
         store_name: storeName,
         phone
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+      emailRedirectTo: undefined
     }
   })
 
   if (error) return { error: error.message }
-  return { success: true }
+  return { success: true, redirectTo: '/onboarding' }
 }
 
 export async function signInWithEmail(formData: z.infer<typeof loginSchema>) {
@@ -62,7 +63,7 @@ export async function signInWithEmail(formData: z.infer<typeof loginSchema>) {
   if (error) return { error: 'Invalid email or password' }
 
   // Check profile and tenant status (using service role to bypass RLS for this check)
-  const adminSupabase = await createClient(true)
+  const adminSupabase = createAdminClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return { error: 'Authentication failed' }
@@ -87,7 +88,7 @@ export async function signInWithEmail(formData: z.infer<typeof loginSchema>) {
 
   if (tenant.status === 'pending_admin_approval') return { success: true, redirectTo: '/pending-approval' }
   if (tenant.status === 'suspended') return { success: true, redirectTo: '/suspended' }
-  if (tenant.status === 'cancelled') return { success: true, redirectTo: '/pricing' }
+  if (tenant.status === 'cancelled') return { success: true, redirectTo: '/onboarding' }
 
   return { success: true, redirectTo: '/dashboard' }
 }
