@@ -87,12 +87,13 @@ export default async function BillingPage() {
           <PlanUsage tenant={tenant} />
         </div>
 
-        {/* Section 4: Billing History (Placeholder) */}
+        {/* Section 4: Billing History */}
         <div className="space-y-4">
           <h4 className="text-sm font-medium">Billing History</h4>
-          <div className="rounded-md border">
-            <div className="p-8 text-center text-sm text-muted-foreground">
-              No recent billing history found.
+          <div className="rounded-xl border bg-muted/10">
+            <div className="p-12 text-center">
+              <p className="text-sm font-medium text-muted-foreground">No recent billing history found.</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Invoices for your subscription will appear here.</p>
             </div>
           </div>
         </div>

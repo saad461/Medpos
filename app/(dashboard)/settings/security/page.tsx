@@ -74,31 +74,33 @@ export default async function SecurityPage() {
             </div>
 
             <Button variant="outline" size="sm" disabled className="w-full">
-              Sign out of all other sessions (Coming soon)
+              Sign out of all other sessions
             </Button>
           </CardContent>
         </Card>
 
         {/* Section 3: Two-Factor Authentication */}
-        <Card className="opacity-60 grayscale-[0.5]">
+        <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="text-base">Two-Factor Authentication</CardTitle>
-              <Badge variant="secondary">STUB</Badge>
             </div>
             <CardDescription>
-              Add an extra layer of security to your account.
+              Add an extra layer of security to your account using TOTP or SMS.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4 p-4 rounded-lg border border-dashed">
+            <div className="flex items-center gap-4 p-4 rounded-lg border border-dashed bg-muted/10">
               <Lock className="h-8 w-8 text-muted-foreground" />
               <div>
-                <p className="font-medium">2FA is coming soon</p>
+                <p className="font-medium">Secure your account</p>
                 <p className="text-xs text-muted-foreground">
-                  We are working on adding support for authentication apps and SMS codes.
+                  Multi-factor authentication is currently being rolled out to all MedPOS users.
                 </p>
               </div>
+              <Button size="sm" variant="outline" disabled className="ml-auto">
+                Enable 2FA
+              </Button>
             </div>
           </CardContent>
         </Card>
