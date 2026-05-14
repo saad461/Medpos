@@ -90,7 +90,7 @@ export function SignupForm({ inviteData }: SignupFormProps) {
         toast.success(`Welcome to ${inviteData.storeName}!`)
         router.push('/dashboard')
       } else {
-        // Normal flow (Step 5 logic)
+        // Redirect to onboarding (no email verification check for now)
         router.push('/onboarding')
       }
     } catch (error: any) {

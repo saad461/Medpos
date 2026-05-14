@@ -23,12 +23,29 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, '')     // trim hyphens from ends
 }
 
-export function generateUniqueSlug(baseName: string, existingSlugs: string[]): string {
+export async function generateUniqueSlug(
+  baseName: string,
+  supabaseAdminClient: any
+): Promise<string> {
   let slug = slugify(baseName)
   let counter = 1
-  while (existingSlugs.includes(slug)) {
+
+  while (true) {
+    const { data } = await supabaseAdminClient
+      .from('tenants')
+      .select('id')
+      .eq('slug', slug)
+      .single()
+
+    if (!data) return slug // slug is available
+
     slug = `${slugify(baseName)}-${counter}`
     counter++
+
+    if (counter > 10) {
+      // Fallback: add timestamp
+      slug = `${slugify(baseName)}-${Date.now()}`
+      return slug
+    }
   }
-  return slug
 }
